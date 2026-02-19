@@ -9,7 +9,7 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
                 Kembali ke Data Client
             </a>
-            <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Kartu Realisasi</h1>
+            <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Kartu Riwayat Realisasi</h1>
         </div>
         <div>
             <a href="{{ route('clients.edit', $client->id) }}" class="inline-flex items-center gap-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-medium py-2 px-4 rounded-xl text-sm transition shadow-sm">
@@ -20,6 +20,7 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
         <div class="md:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col justify-center">
             <div class="flex items-start gap-5">
                 <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 font-bold text-2xl flex-shrink-0 border-4 border-indigo-50">
@@ -48,8 +49,8 @@
                     <div class="text-4xl font-bold">{{ $client->transactions()->where('status', 'open')->count() }} <span class="text-lg font-normal text-indigo-200">Unit</span></div>
                 </div>
                 <div>
-                    <p class="text-indigo-200 text-xs font-bold uppercase tracking-wider mb-1">Total Transaksi</p>
-                    <div class="text-lg font-semibold">{{ $client->transactions()->count() }} <span class="text-sm font-normal text-indigo-200">Kali</span></div>
+                    <p class="text-indigo-200 text-xs font-bold uppercase tracking-wider mb-1">Total Riwayat</p>
+                    <div class="text-lg font-semibold">{{ $client->transactions()->count() }} <span class="text-sm font-normal text-indigo-200">Transaksi</span></div>
                 </div>
             </div>
             <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>

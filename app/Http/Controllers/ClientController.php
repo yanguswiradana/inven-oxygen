@@ -9,87 +9,69 @@ use Illuminate\Http\Request;
 class ClientController extends Controller
 {
     /**
-     * Menampilkan daftar semua client
+     * Tampilkan daftar semua client
      */
-    public function index()
-    {
+    public function index() {
         $clients = Client::latest()->get();
         return view('clients.index', compact('clients'));
     }
 
     /**
-     * Form tambah client baru
+     * Tampilkan Form Tambah Client
      */
-    public function create()
-    {
+    public function create() {
         return view('clients.create');
     }
 
     /**
-     * Menyimpan data client baru ke database
+     * Simpan Client Baru
      */
-    public function store(Request $request)
-    {
-        // Validasi sederhana (opsional tapi disarankan)
-        $request->validate([
-            'name' => 'required',
-        ]);
-
+    public function store(Request $request) {
         $client = Client::create($request->all());
-
         HistoryLog::record('CREATE CLIENT', "Menambah client: {$client->name}");
-
         return redirect()->route('clients.index')->with('success', 'Client berhasil ditambahkan');
     }
 
     /**
-     * Menampilkan Detail Kartu Realisasi (Fitur Baru)
+     * Tampilkan Detail Client (KARTU RIWAYAT) - INI YANG BARU
      */
     public function show($id)
     {
-        // 1. Ambil data client
+        // 1. Ambil data client berdasarkan ID
         $client = Client::findOrFail($id);
 
-        // 2. Ambil transaksi milik client ini
-        // Load data 'cylinder' agar tahu nomor serinya dan urutkan dari yang terbaru
+        // 2. Ambil riwayat transaksi milik client ini
+        // Kita load relasi 'cylinder' agar bisa menampilkan nomor seri tabung
+        // Urutkan dari transaksi terbaru
         $transactions = $client->transactions()
                                ->with('cylinder')
                                ->orderBy('rent_date', 'desc')
-                               ->paginate(10);
+                               ->paginate(10); // Batasi 10 per halaman
 
         return view('clients.show', compact('client', 'transactions'));
     }
 
     /**
-     * Form edit data client
+     * Tampilkan Form Edit Client
      */
-    public function edit(Client $client)
-    {
+    public function edit(Client $client) {
         return view('clients.edit', compact('client'));
     }
 
     /**
-     * Memperbarui data client di database
+     * Update Data Client
      */
-    public function update(Request $request, Client $client)
-    {
+    public function update(Request $request, Client $client) {
         $client->update($request->all());
-
         HistoryLog::record('UPDATE CLIENT', "Update client: {$client->name}");
-
         return redirect()->route('clients.index')->with('success', 'Client berhasil diupdate');
     }
 
     /**
-     * Menghapus data client
+     * Hapus Client (Opsional jika dibutuhkan nanti)
      */
-    public function destroy(Client $client)
-    {
-        $clientName = $client->name;
+    public function destroy(Client $client) {
         $client->delete();
-
-        HistoryLog::record('DELETE CLIENT', "Menghapus client: {$clientName}");
-
-        return redirect()->route('clients.index')->with('success', 'Client berhasil dihapus');
+        return redirect()->route('clients.index')->with('success', 'Client dihapus');
     }
 }

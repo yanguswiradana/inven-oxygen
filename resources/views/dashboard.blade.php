@@ -12,6 +12,51 @@
     </div>
 </div>
 
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 0 1 1-1v2.586a1 1 0 0 1-.293.707l-1 1A1 1 0 0 1 15 7h-6a1 1 0 0 1-.707-.293l-1-1A1 1 0 0 1 7 4.586V2z"/>
+                <path d="M6 8a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8z"/>
+            </svg>
+        </div>
+        <div>
+            <div class="text-xs text-slate-400 font-bold uppercase tracking-wider">Total Aset</div>
+            <div class="text-2xl font-bold text-slate-800">{{ $stats['total'] }} <span class="text-xs font-normal text-slate-400">Unit</span></div>
+        </div>
+    </div>
+
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        </div>
+        <div>
+            <div class="text-xs text-slate-400 font-bold uppercase tracking-wider">Tersedia</div>
+            <div class="text-2xl font-bold text-emerald-600">{{ $stats['available'] }} <span class="text-xs font-normal text-slate-400">Unit</span></div>
+        </div>
+    </div>
+
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </div>
+        <div>
+            <div class="text-xs text-slate-400 font-bold uppercase tracking-wider">Disewa</div>
+            <div class="text-2xl font-bold text-amber-600">{{ $stats['rented'] }} <span class="text-xs font-normal text-slate-400">Unit</span></div>
+        </div>
+    </div>
+
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+        </div>
+        <div>
+            <div class="text-xs text-slate-400 font-bold uppercase tracking-wider">Perbaikan</div>
+            <div class="text-2xl font-bold text-red-600">{{ $stats['maintenance'] }} <span class="text-xs font-normal text-slate-400">Unit</span></div>
+        </div>
+    </div>
+</div>
+
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
 
     <div class="lg:col-span-1">
@@ -22,48 +67,131 @@
                 </div>
                 <div>
                     <h2 class="text-lg font-bold text-slate-800 leading-tight">Transaksi Keluar</h2>
-                    <p class="text-slate-400 text-xs">Kirim tabung ke client.</p>
+                    <p class="text-slate-400 text-xs">Kirim tabung ke realisasi.</p>
                 </div>
             </div>
 
             <form action="{{ route('transaction.store') }}" method="POST" class="space-y-5">
                 @csrf
 
-                <div class="relative">
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Pilih Client</label>
+                <div class="relative"
+                     x-data="clientSearch({
+                        data: {{ Js::from($clients) }}
+                     })">
+
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Pilih Nama Realisasi</label>
+                    <input type="hidden" name="client_id" x-model="selectedId">
+
                     <div class="relative">
-                        <select name="client_id" class="appearance-none w-full px-4 py-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-medium focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all cursor-pointer">
-                            <option value="" disabled selected>-- Pilih Client --</option>
-                            @foreach($clients as $c)
-                                <option value="{{ $c->id }}">{{ $c->name }}</option>
-                            @endforeach
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        <input
+                            type="text"
+                            x-model="search"
+                            @focus="open = true"
+                            @click.outside="open = false"
+                            placeholder="Ketik nama realisasi..."
+                            class="w-full px-4 py-3.5 pl-11 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-medium focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder-slate-400"
+                            autocomplete="off"
+                        >
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
+                            <svg class="w-4 h-4 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+
+                    <div
+                        x-show="open"
+                        x-transition.opacity.duration.200ms
+                        class="absolute z-30 w-full mt-2 bg-white border border-slate-100 rounded-xl shadow-xl max-h-60 overflow-y-auto"
+                        style="display: none;"
+                    >
+                        <ul>
+                            <li x-show="filteredItems.length === 0" class="px-4 py-3 text-sm text-slate-400 text-center italic">
+                                Realisasi tidak ditemukan.
+                            </li>
+                            <template x-for="item in filteredItems" :key="item.id">
+                                <li
+                                    @click="selectItem(item)"
+                                    class="px-4 py-3 hover:bg-indigo-50 cursor-pointer border-b border-slate-50 last:border-0 transition-colors group"
+                                >
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <div class="font-bold text-slate-700 group-hover:text-indigo-700" x-text="item.name"></div>
+                                            <div class="text-xs text-slate-400" x-text="item.address ? item.address.substring(0, 30) + '...' : 'Tidak ada alamat'"></div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </template>
+                        </ul>
                     </div>
                 </div>
 
-                <div class="relative">
+                <div class="relative"
+                     x-data="cylinderSearch({
+                        data: {{ Js::from($availableCylinders) }}
+                     })">
+
                     <label class="flex justify-between items-center text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                         <span>Pilih Tabung</span>
                         <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold">Ready: {{ $availableCylinders->count() }}</span>
                     </label>
+
+                    <input type="hidden" name="cylinder_id" x-model="selectedId">
+
                     <div class="relative">
-                        <select name="cylinder_id" class="appearance-none w-full px-4 py-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-medium focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all cursor-pointer">
-                            @if($availableCylinders->isEmpty())
-                                <option disabled selected>Stok Habis!</option>
-                            @else
-                                <option value="" disabled selected>-- Pilih Serial Number --</option>
-                                @foreach($availableCylinders as $cyl)
-                                    <option value="{{ $cyl->id }}">{{ $cyl->serial_number }} ({{ $cyl->type }})</option>
-                                @endforeach
-                            @endif
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        <input
+                            type="text"
+                            x-model="search"
+                            @focus="open = true"
+                            @click.outside="open = false"
+                            placeholder="Ketik nomor seri..."
+                            class="w-full px-4 py-3.5 pl-11 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-medium focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder-slate-400"
+                            autocomplete="off"
+                        >
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </div>
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
+                            <svg class="w-4 h-4 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </div>
                     </div>
+
+                    <div
+                        x-show="open"
+                        x-transition.opacity.duration.200ms
+                        class="absolute z-20 w-full mt-2 bg-white border border-slate-100 rounded-xl shadow-xl max-h-60 overflow-y-auto"
+                        style="display: none;"
+                    >
+                        <ul>
+                            <li x-show="filteredItems.length === 0" class="px-4 py-3 text-sm text-slate-400 text-center italic">
+                                Tabung tidak ditemukan.
+                            </li>
+                            <template x-for="item in filteredItems" :key="item.id">
+                                <li
+                                    @click="selectItem(item)"
+                                    class="px-4 py-3 hover:bg-indigo-50 cursor-pointer border-b border-slate-50 last:border-0 transition-colors group"
+                                >
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <div class="font-bold text-slate-700 group-hover:text-indigo-700" x-text="item.serial_number"></div>
+                                            <div class="text-xs text-slate-400" x-text="item.type"></div>
+                                        </div>
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-100 text-emerald-700">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                            Ready
+                                        </span>
+                                    </div>
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+
+                    @if($availableCylinders->isEmpty())
+                        <div class="mt-2 text-xs text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-100">
+                            Stok tabung kosong. Harap tunggu pengembalian.
+                        </div>
+                    @endif
                 </div>
 
                 <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl transition-all duration-200 shadow-lg shadow-indigo-200 flex justify-center items-center gap-2 group mt-4">
@@ -79,7 +207,7 @@
             <div class="p-6 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
                 <div>
                     <h2 class="font-bold text-slate-800 text-lg">Sedang Disewa</h2>
-                    <p class="text-slate-400 text-xs mt-1">Daftar tabung yang ada di client.</p>
+                    <p class="text-slate-400 text-xs mt-1">Daftar tabung yang ada di realisasi.</p>
                 </div>
                 <span class="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 border border-amber-200 shadow-sm">
                     {{ $activeTransactions->count() }} Unit Diluar
@@ -90,7 +218,7 @@
                 <table class="w-full text-sm text-left">
                     <thead class="text-xs text-slate-400 uppercase bg-slate-50/50 border-b border-slate-100">
                         <tr>
-                            <th class="px-6 py-4 font-semibold">Client</th>
+                            <th class="px-6 py-4 font-semibold">Nama Realisasi</th>
                             <th class="px-6 py-4 font-semibold">Tabung</th>
                             <th class="px-6 py-4 font-semibold">Tgl Sewa</th>
                             <th class="px-6 py-4 font-semibold text-right">Aksi</th>
@@ -101,10 +229,13 @@
                         <tr class="hover:bg-slate-50 transition-colors group">
                             <td class="px-6 py-4">
                                 <div class="font-bold text-slate-800">{{ $trx->client->name }}</div>
-                                <div class="text-xs text-slate-400 mt-0.5 group-hover:text-indigo-500 transition-colors">ID: #{{ $trx->client->id }}</div>
                             </td>
                             <td class="px-6 py-4">
-                                <span class="font-mono text-xs font-bold bg-slate-100 text-slate-700 px-2.5 py-1.5 rounded-lg border border-slate-200">
+                                <span class="font-mono text-xs font-bold bg-slate-100 text-slate-700 px-2.5 py-1.5 rounded-lg border border-slate-200 flex items-center gap-2 w-fit">
+                                    <svg class="w-3 h-3 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 0 1 1-1v2.586a1 1 0 0 1-.293.707l-1 1A1 1 0 0 1 15 7h-6a1 1 0 0 1-.707-.293l-1-1A1 1 0 0 1 7 4.586V2z"/>
+                                        <path d="M6 8a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8z"/>
+                                    </svg>
                                     {{ $trx->cylinder->serial_number }}
                                 </span>
                             </td>
@@ -140,4 +271,44 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('cylinderSearch', (config) => ({
+            items: config.data,
+            search: '',
+            selectedId: '',
+            open: false,
+            get filteredItems() {
+                if (this.search === '') { return this.items; }
+                return this.items.filter(item => {
+                    return item.serial_number.toLowerCase().includes(this.search.toLowerCase());
+                });
+            },
+            selectItem(item) {
+                this.selectedId = item.id;
+                this.search = item.serial_number;
+                this.open = false;
+            }
+        }));
+
+        Alpine.data('clientSearch', (config) => ({
+            items: config.data,
+            search: '',
+            selectedId: '',
+            open: false,
+            get filteredItems() {
+                if (this.search === '') { return this.items; }
+                return this.items.filter(item => {
+                    return item.name.toLowerCase().includes(this.search.toLowerCase());
+                });
+            },
+            selectItem(item) {
+                this.selectedId = item.id;
+                this.search = item.name;
+                this.open = false;
+            }
+        }));
+    })
+</script>
 @endsection
