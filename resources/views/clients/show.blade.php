@@ -7,7 +7,7 @@
         <div>
             <a href="{{ route('clients.index') }}" class="text-slate-500 hover:text-indigo-600 text-sm flex items-center gap-1 mb-2 transition-colors font-medium">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                Kembali ke Data Client
+                Kembali ke Data Realisasi
             </a>
             <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Kartu Riwayat Realisasi</h1>
         </div>
@@ -19,8 +19,7 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <div class="md:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col justify-center">
             <div class="flex items-start gap-5">
                 <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 font-bold text-2xl flex-shrink-0 border-4 border-indigo-50">
@@ -57,7 +56,61 @@
         </div>
     </div>
 
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-8 relative z-20">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="p-2 bg-indigo-50 rounded-lg text-indigo-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            </div>
+            <div>
+                <h3 class="font-bold text-slate-800">Transaksi Keluar (Sewa Baru)</h3>
+                <p class="text-xs text-slate-400">Pilih tabung yang ingin dibawa oleh realisasi ini.</p>
+            </div>
+        </div>
+
+        <form action="{{ route('transaction.store') }}" method="POST" class="flex flex-col sm:flex-row gap-4 items-start sm:items-end">
+            @csrf
+            <input type="hidden" name="client_id" value="{{ $client->id }}">
+
+            <div class="flex-1 w-full relative" x-data="cylinderSearch({ data: {{ Js::from($availableCylinders) }} })">
+                <label class="flex justify-between items-center text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                    <span>Cari Nomor Seri Tabung</span>
+                    <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold">Ready: {{ $availableCylinders->count() }}</span>
+                </label>
+                <input type="hidden" name="cylinder_id" x-model="selectedId">
+                <div class="relative">
+                    <input type="text" x-model="search" @focus="open = true" @click.outside="open = false" placeholder="Ketik nomor seri tabung..." class="w-full px-4 py-3 pl-11 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-medium focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder-slate-400" autocomplete="off">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                </div>
+
+                <div x-show="open" x-transition.opacity.duration.200ms class="absolute z-30 w-full mt-2 bg-white border border-slate-100 rounded-xl shadow-xl max-h-60 overflow-y-auto" style="display: none;">
+                    <ul>
+                        <li x-show="filteredItems.length === 0" class="px-4 py-3 text-sm text-slate-400 text-center italic">Tabung tidak ditemukan.</li>
+                        <template x-for="item in filteredItems" :key="item.id">
+                            <li @click="selectItem(item)" class="px-4 py-3 hover:bg-indigo-50 cursor-pointer border-b border-slate-50 last:border-0 transition-colors group">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <div class="font-bold text-slate-700 group-hover:text-indigo-700" x-text="item.serial_number"></div>
+                                        <div class="text-xs text-slate-400" x-text="item.type"></div>
+                                    </div>
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-100 text-emerald-700">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Ready
+                                    </span>
+                                </div>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-6 rounded-xl transition-all shadow-md flex items-center justify-center gap-2">
+                <span>Proses Kirim</span>
+            </button>
+        </form>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden relative z-10">
         <div class="p-6 border-b border-slate-50 bg-slate-50/50">
             <h3 class="font-bold text-slate-800 text-lg">Aktivitas Peminjaman</h3>
             <p class="text-slate-500 text-xs mt-1">Rekap waktu pengambilan dan pengembalian tabung.</p>
@@ -71,7 +124,7 @@
                         <th class="px-6 py-4 font-semibold">Waktu Pengambilan</th>
                         <th class="px-6 py-4 font-semibold">Waktu Pengembalian</th>
                         <th class="px-6 py-4 font-semibold">Balance Waktu</th>
-                        <th class="px-6 py-4 font-semibold text-right">Status</th>
+                        <th class="px-6 py-4 font-semibold text-right">Status / Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50">
@@ -125,9 +178,18 @@
 
                         <td class="px-6 py-4 text-right">
                             @if($trx->status == 'open')
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 border border-amber-200">
-                                    <span class="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span> Dipinjam
-                                </span>
+                                <div class="flex flex-col items-end gap-2">
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 border border-amber-200">
+                                        <span class="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span> Dipinjam
+                                    </span>
+
+                                    <form action="{{ route('transaction.return', $trx->id) }}" method="POST">
+                                        @csrf @method('PUT')
+                                        <button type="submit" class="text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 hover:bg-emerald-600 hover:text-white px-3 py-1.5 rounded-lg transition-colors shadow-sm">
+                                            Terima Kembali
+                                        </button>
+                                    </form>
+                                </div>
                             @else
                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
                                     <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span> Selesai
@@ -154,4 +216,26 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('cylinderSearch', (config) => ({
+            items: config.data,
+            search: '',
+            selectedId: '',
+            open: false,
+            get filteredItems() {
+                if (this.search === '') { return this.items; }
+                return this.items.filter(item => {
+                    return item.serial_number.toLowerCase().includes(this.search.toLowerCase());
+                });
+            },
+            selectItem(item) {
+                this.selectedId = item.id;
+                this.search = item.serial_number;
+                this.open = false;
+            }
+        }));
+    })
+</script>
 @endsection

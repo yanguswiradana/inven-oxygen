@@ -21,7 +21,7 @@ class CylinderSeeder extends Seeder
 
             Cylinder::create([
                 'serial_number' => $sn,
-                'type' => '6m3', // Ukuran standar
+                'type' => 'O2', // Ukuran standar
                 'status' => $status
             ]);
         }
