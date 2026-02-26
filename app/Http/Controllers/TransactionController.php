@@ -12,10 +12,17 @@ use Illuminate\Support\Facades\DB;
 class TransactionController extends Controller
 {
     public function index() {
-        $activeTransactions = Transaction::with(['client', 'cylinder'])->where('status', 'open')->latest()->get();
+        // 1. Data Transaksi Aktif (Yang sedang dipinjam)
+        $activeTransactions = Transaction::with(['client', 'cylinder'])
+                                         ->where('status', 'open')
+                                         ->latest()
+                                         ->get();
+
+        // 2. Data untuk Dropdown Form
         $clients = Client::orderBy('name', 'asc')->get();
         $availableCylinders = Cylinder::where('status', 'available')->get();
 
+        // 3. Statistik Utama (Kartu Besar)
         $stats = [
             'total'       => Cylinder::count(),
             'available'   => $availableCylinders->count(),
@@ -23,7 +30,44 @@ class TransactionController extends Controller
             'maintenance' => Cylinder::where('status', 'maintenance')->count(),
         ];
 
-        return view('dashboard', compact('activeTransactions', 'clients', 'availableCylinders', 'stats'));
+        // ====================================================
+        // 4. LOGIKA BARU: Hitung Stok per Tipe Gas (O2, CO2, dll)
+        // ====================================================
+        $gasTypes = ['O2', 'CO2', 'N2', 'AR', 'C2H2'];
+        $stockPerType = [];
+
+        // Siapkan array kosong agar tidak error jika data kosong
+        foreach ($gasTypes as $type) {
+            $stockPerType[$type] = [
+                'total' => 0,
+                'available' => 0,
+                'rented' => 0,
+                'maintenance' => 0,
+            ];
+        }
+
+        // Ambil hitungan dari database dalam 1 kali query (Cepat & Ringan)
+        $cylinderStats = Cylinder::selectRaw('type, status, count(*) as count')
+            ->groupBy('type', 'status')
+            ->get();
+
+        // Masukkan data dari database ke array yang sudah disiapkan
+        foreach ($cylinderStats as $stat) {
+            // Pastikan tipe gas ada dalam daftar yang kita pantau
+            if (array_key_exists($stat->type, $stockPerType)) {
+                $stockPerType[$stat->type][$stat->status] = $stat->count;
+                $stockPerType[$stat->type]['total'] += $stat->count;
+            }
+        }
+
+        // Kirim semua variabel ke View, TERMASUK $stockPerType
+        return view('dashboard', compact(
+            'activeTransactions',
+            'clients',
+            'availableCylinders',
+            'stats',
+            'stockPerType' // <-- Ini yang sebelumnya hilang
+        ));
     }
 
     public function store(Request $request) {
@@ -34,7 +78,11 @@ class TransactionController extends Controller
 
         DB::transaction(function() use ($request) {
             $cyl = Cylinder::findOrFail($request->cylinder_id);
-            if($cyl->status != 'available') throw new \Exception('Tabung tidak tersedia');
+
+            // Validasi: Tabung harus available
+            if($cyl->status != 'available') {
+                throw new \Exception('Tabung tidak tersedia (Status: ' . $cyl->status . ')');
+            }
 
             Transaction::create([
                 'client_id' => $request->client_id,
@@ -42,24 +90,36 @@ class TransactionController extends Controller
                 'rent_date' => now(),
                 'status' => 'open'
             ]);
+
+            // Update status tabung jadi rented
             $cyl->update(['status' => 'rented']);
+
+            // Catat Log
             $client = Client::findOrFail($request->client_id);
             HistoryLog::record('SEWA', "Tabung {$cyl->serial_number} keluar ke {$client->name}");
         });
 
-        // UBAH KE BACK() AGAR FLEKSIBEL
+        // Kembali ke halaman sebelumnya (bisa Dashboard atau Detail Realisasi)
         return redirect()->back()->with('success', 'Transaksi Keluar Berhasil Dicatat');
     }
 
     public function returnCylinder($id) {
         DB::transaction(function() use ($id) {
             $trx = Transaction::with('cylinder', 'client')->findOrFail($id);
-            $trx->update(['return_date' => now(), 'status' => 'closed']);
+
+            // Tutup transaksi
+            $trx->update([
+                'return_date' => now(),
+                'status' => 'closed'
+            ]);
+
+            // Kembalikan status tabung jadi available
             $trx->cylinder->update(['status' => 'available']);
+
+            // Catat Log
             HistoryLog::record('KEMBALI', "Tabung {$trx->cylinder->serial_number} kembali dari {$trx->client->name}");
         });
 
-        // UBAH KE BACK() AGAR FLEKSIBEL
         return redirect()->back()->with('success', 'Tabung Berhasil Dikembalikan');
     }
 }

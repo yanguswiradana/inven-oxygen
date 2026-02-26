@@ -6,7 +6,7 @@
     <title>Ary Bayu Gas - Inventory System</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -25,9 +25,8 @@
     <div class="flex h-screen overflow-hidden">
 
         <div class="md:hidden fixed w-full top-0 z-30 flex items-center justify-between bg-white border-b border-slate-200 p-4 shadow-sm">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-xs shadow-md">ABG</div>
-                <span class="font-bold text-slate-800 tracking-tight">Ary Bayu Gas</span>
+            <div class="flex items-center">
+                <span class="font-extrabold text-indigo-700 text-lg tracking-tight">Ary Bayu Gas</span>
             </div>
             <button @click="sidebarOpen = !sidebarOpen" class="text-slate-500 hover:text-indigo-600 focus:outline-none p-1 rounded-md hover:bg-slate-100 transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
@@ -36,9 +35,8 @@
 
         <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-slate-200 transform transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:inset-auto md:h-screen md:flex md:flex-col shadow-xl md:shadow-none">
 
-            <div class="hidden md:flex items-center gap-3 px-6 h-20 border-b border-slate-100">
-                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-indigo-300 shadow-lg">ABG</div>
-                <span class="font-bold text-lg text-slate-800 tracking-tight leading-tight">Ary Bayu<br>Gas</span>
+            <div class="hidden md:flex items-center px-6 h-20 border-b border-slate-100">
+                <span class="font-extrabold text-xl text-indigo-700 tracking-tight">Ary Bayu Gas</span>
             </div>
 
             <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto mt-16 md:mt-0">
@@ -85,14 +83,12 @@
         <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 pt-16 md:pt-0">
             <div class="h-full p-4 md:p-8">
                 <div class="max-w-7xl mx-auto pb-12">
-
                     @if(session('success'))
                         <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)" x-transition class="mb-6 flex items-center p-4 bg-emerald-50 border border-emerald-100 rounded-xl shadow-sm text-emerald-700">
                             <div class="p-1 bg-emerald-100 rounded-full mr-3"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></div>
                             <span class="font-medium text-sm">{{ session('success') }}</span>
                         </div>
                     @endif
-
                     @if($errors->any())
                         <div class="mb-6 bg-red-50 border border-red-100 rounded-xl p-4 shadow-sm">
                             <div class="flex items-center mb-2 text-red-700 font-bold text-sm">
@@ -104,11 +100,10 @@
                             </ul>
                         </div>
                     @endif
-
                     @yield('content')
                 </div>
             </div>
         </main>
-
-    </div> </body>
+    </div>
+</body>
 </html>
