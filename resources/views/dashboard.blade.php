@@ -145,7 +145,7 @@
                             x-model="search"
                             @focus="open = true"
                             @click.outside="open = false"
-                            placeholder="Ketik nomor seri..."
+                            placeholder="Ketik nomor seri atau tipe gas"
                             class="w-full px-4 py-3.5 pl-11 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-medium focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder-slate-400"
                             autocomplete="off"
                         >
@@ -274,6 +274,7 @@
 
 <script>
     document.addEventListener('alpine:init', () => {
+        // Logika Pencarian Tabung (Diperbarui: Search by Tipe)
         Alpine.data('cylinderSearch', (config) => ({
             items: config.data,
             search: '',
@@ -281,17 +282,22 @@
             open: false,
             get filteredItems() {
                 if (this.search === '') { return this.items; }
+                const searchTerm = this.search.toLowerCase();
                 return this.items.filter(item => {
-                    return item.serial_number.toLowerCase().includes(this.search.toLowerCase());
+                    // Cari di Serial Number ATAU cari di Tipe Gas
+                    return item.serial_number.toLowerCase().includes(searchTerm) ||
+                           item.type.toLowerCase().includes(searchTerm);
                 });
             },
             selectItem(item) {
                 this.selectedId = item.id;
-                this.search = item.serial_number;
+                // UX: Tampilkan Serial Number dan Tipenya di input setelah dipilih
+                this.search = item.serial_number + ' (' + item.type + ')';
                 this.open = false;
             }
         }));
 
+        // Logika Pencarian Client (Realisasi)
         Alpine.data('clientSearch', (config) => ({
             items: config.data,
             search: '',

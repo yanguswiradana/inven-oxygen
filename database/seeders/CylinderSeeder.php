@@ -9,19 +9,19 @@ class CylinderSeeder extends Seeder
 {
     public function run(): void
     {
-        // Buat 50 Tabung
+        // Tipe gas yang sudah FIX
+        $gasTypes = ['O2', 'CO2', 'N2', 'AR', 'C2H2'];
+
         for ($i = 1; $i <= 50; $i++) {
-            // Format: TB-001, TB-002, dst
             $sn = 'TB-' . str_pad($i, 3, '0', STR_PAD_LEFT);
 
-            // Random status awal (sebagian besar Available)
             $rand = rand(1, 10);
             $status = 'available';
-            if ($rand > 8) $status = 'maintenance'; // 20% kemungkinan maintenance
+            if ($rand > 8) $status = 'maintenance';
 
             Cylinder::create([
                 'serial_number' => $sn,
-                'type' => 'O2', // Ukuran standar
+                'type' => $gasTypes[array_rand($gasTypes)],
                 'status' => $status
             ]);
         }

@@ -3,15 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
-use App\Models\Cylinder; // TAMBAHKAN INI
+use App\Models\Cylinder;
 use App\Models\HistoryLog;
 use Illuminate\Http\Request;
 
 class ClientController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $clients = Client::latest()->paginate(10);
+        $query = Client::query();
+
+        // LOGIKA PENCARIAN (BARU)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('name', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhere('address', 'like', "%{$search}%");
+        }
+
+        // Tambahkan withQueryString() agar pagination tidak mereset hasil pencarian
+        $clients = $query->latest()->paginate(10)->withQueryString();
+
         return view('clients.index', compact('clients'));
     }
 
@@ -38,9 +50,7 @@ class ClientController extends Controller
                                ->orderBy('rent_date', 'desc')
                                ->paginate(10);
 
-        // AMBIL DATA TABUNG YANG TERSEDIA UNTUK FORM TRANSAKSI CEPAT
         $availableCylinders = Cylinder::where('status', 'available')->get();
-
         return view('clients.show', compact('client', 'transactions', 'availableCylinders'));
     }
 
