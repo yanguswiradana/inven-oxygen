@@ -2,7 +2,6 @@
 
 @section('content')
 <div class="max-w-6xl mx-auto">
-
     <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <a href="{{ route('clients.index') }}" class="text-slate-500 hover:text-indigo-600 text-sm flex items-center gap-1 mb-2 transition-colors font-medium">
@@ -73,12 +72,12 @@
 
             <div class="flex-1 w-full relative" x-data="cylinderSearch({ data: {{ Js::from($availableCylinders) }} })">
                 <label class="flex justify-between items-center text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                    <span>Cari Nomor Seri Tabung Atau Tipe Gas</span>
+                    <span>Cari Nomor Seri Tabung</span>
                     <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold">Ready: {{ $availableCylinders->count() }}</span>
                 </label>
                 <input type="hidden" name="cylinder_id" x-model="selectedId">
                 <div class="relative">
-                    <input type="text" x-model="search" @focus="open = true" @click.outside="open = false" placeholder="Ketik nomor seri tabung atau tipe gas..." class="w-full px-4 py-3 pl-11 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-medium focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder-slate-400" autocomplete="off">
+                    <input type="text" x-model="search" @focus="open = true" @click.outside="open = false" placeholder="Ketik nomor seri atau tipe gas..." class="w-full px-4 py-3 pl-11 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-medium focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder-slate-400" autocomplete="off">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
@@ -120,25 +119,24 @@
             <table class="w-full text-sm text-left">
                 <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-100">
                     <tr>
-                        <th class="px-6 py-4 font-semibold">No. Seri Tabung</th>
-                        <th class="px-6 py-4 font-semibold">Waktu Pengambilan</th>
-                        <th class="px-6 py-4 font-semibold">Waktu Pengembalian</th>
-                        <th class="px-6 py-4 font-semibold">Balance Waktu</th>
-                        <th class="px-6 py-4 font-semibold text-right">Status / Aksi</th>
+                        <th class="px-6 py-4 font-semibold whitespace-nowrap">No. Seri Tabung</th>
+                        <th class="px-6 py-4 font-semibold whitespace-nowrap">Waktu Pengambilan</th>
+                        <th class="px-6 py-4 font-semibold whitespace-nowrap">Waktu Pengembalian</th>
+                        <th class="px-6 py-4 font-semibold whitespace-nowrap">Balance Waktu</th>
+                        <th class="px-6 py-4 font-semibold text-right whitespace-nowrap">Status / Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50">
                     @forelse($transactions as $trx)
                     <tr class="hover:bg-slate-50 transition-colors group">
-
-                        <td class="px-6 py-4">
+                        <td class="px-6 py-4 whitespace-nowrap">
                             <span class="font-mono text-xs font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1.5 rounded-lg border border-indigo-100 group-hover:bg-indigo-100 transition-colors">
                                 {{ $trx->cylinder->serial_number }}
                             </span>
                             <div class="text-[10px] text-slate-400 mt-1.5">{{ $trx->cylinder->type }}</div>
                         </td>
 
-                        <td class="px-6 py-4">
+                        <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center gap-2">
                                 <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
                                 <div>
@@ -148,7 +146,7 @@
                             </div>
                         </td>
 
-                        <td class="px-6 py-4">
+                        <td class="px-6 py-4 whitespace-nowrap">
                             @if($trx->return_date)
                             <div class="flex items-center gap-2">
                                 <div class="w-2 h-2 rounded-full bg-blue-500"></div>
@@ -162,7 +160,7 @@
                             @endif
                         </td>
 
-                        <td class="px-6 py-4">
+                        <td class="px-6 py-4 whitespace-nowrap">
                             @if($trx->status == 'open')
                                 <div class="text-amber-600 font-bold text-xs bg-amber-50 px-2 py-1 rounded w-fit border border-amber-100">
                                     {{ $trx->rent_date->diffForHumans(now(), ['syntax' => \Carbon\CarbonInterface::DIFF_ABSOLUTE, 'parts' => 2]) }}
@@ -176,13 +174,12 @@
                             @endif
                         </td>
 
-                        <td class="px-6 py-4 text-right">
+                        <td class="px-6 py-4 text-right whitespace-nowrap">
                             @if($trx->status == 'open')
                                 <div class="flex flex-col items-end gap-2">
                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 border border-amber-200">
                                         <span class="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span> Dipinjam
                                     </span>
-
                                     <form action="{{ route('transaction.return', $trx->id) }}" method="POST">
                                         @csrf @method('PUT')
                                         <button type="submit" class="text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 hover:bg-emerald-600 hover:text-white px-3 py-1.5 rounded-lg transition-colors shadow-sm">
@@ -228,14 +225,12 @@
                 if (this.search === '') { return this.items; }
                 const searchTerm = this.search.toLowerCase();
                 return this.items.filter(item => {
-                    // Cari di Serial Number ATAU cari di Tipe Gas
                     return item.serial_number.toLowerCase().includes(searchTerm) ||
                            item.type.toLowerCase().includes(searchTerm);
                 });
             },
             selectItem(item) {
                 this.selectedId = item.id;
-                // UX: Tampilkan Serial Number dan Tipenya di input setelah dipilih
                 this.search = item.serial_number + ' (' + item.type + ')';
                 this.open = false;
             }

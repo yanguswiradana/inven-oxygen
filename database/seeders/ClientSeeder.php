@@ -4,22 +4,29 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Client;
+use Faker\Factory as Faker;
 
 class ClientSeeder extends Seeder
 {
     public function run(): void
     {
-        $clients = [
-            ['name' => 'RSUD Kota Sejahtera', 'phone' => '08111222333', 'address' => 'Jl. Jendral Sudirman No. 1'],
-            ['name' => 'Klinik Pratama Medika', 'phone' => '081234567890', 'address' => 'Jl. Kebon Jeruk No. 15'],
-            ['name' => 'Bengkel Las Maju Jaya', 'phone' => '085678901234', 'address' => 'Kawasan Industri Blok C-4'],
-            ['name' => 'Puskesmas Melati', 'phone' => '081345678901', 'address' => 'Jl. Mawar Indah No. 88'],
-            ['name' => 'PT. Oksigen Murni Abadi', 'phone' => '021-5556667', 'address' => 'Jl. Raya Industri Km 12'],
-            ['name' => 'Dr. Budi Santoso (Praktek)', 'phone' => '081298765432', 'address' => 'Ruko Grand Wisata B5'],
-        ];
+        // Gunakan Faker bahasa Indonesia
+        $faker = Faker::create('id_ID');
 
-        foreach ($clients as $c) {
-            Client::create($c);
+        $clients = [];
+        for ($i = 1; $i <= 200; $i++) {
+            $clients[] = [
+                'name' => $faker->company,
+                'phone' => $faker->phoneNumber,
+                'address' => $faker->address,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        // Insert sekaligus agar eksekusi seeder sangat cepat
+        foreach (array_chunk($clients, 50) as $chunk) {
+            Client::insert($chunk);
         }
     }
 }

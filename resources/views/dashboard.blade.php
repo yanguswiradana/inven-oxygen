@@ -105,7 +105,6 @@
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
                     </div>
-
                     <div x-show="open" x-transition.opacity.duration.200ms class="absolute z-30 w-full mt-2 bg-white border border-slate-100 rounded-xl shadow-xl max-h-60 overflow-y-auto" style="display: none;">
                         <ul>
                             <li x-show="filteredItems.length === 0" class="px-4 py-3 text-sm text-slate-400 text-center italic">Realisasi tidak ditemukan.</li>
@@ -155,12 +154,6 @@
                             </template>
                         </ul>
                     </div>
-
-                    @if($availableCylinders->isEmpty())
-                        <div class="mt-2 text-xs text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-100">
-                            Semua stok tabung kosong.
-                        </div>
-                    @endif
                 </div>
 
                 <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl transition-all duration-200 shadow-lg shadow-indigo-200 flex justify-center items-center gap-2 group mt-4">
@@ -172,34 +165,44 @@
     </div>
 
     <div class="lg:col-span-2">
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden min-h-[500px]">
-            <div class="p-6 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden min-h-[500px] flex flex-col">
+
+            <div class="p-6 border-b border-slate-50 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 bg-slate-50/30">
                 <div>
                     <h2 class="font-bold text-slate-800 text-lg">Sedang Disewa</h2>
                     <p class="text-slate-400 text-xs mt-1">Daftar tabung yang ada di realisasi.</p>
                 </div>
-                <span class="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 border border-amber-200 shadow-sm">
-                    {{ $activeTransactions->count() }} Unit Diluar
-                </span>
+
+                <form action="{{ route('dashboard') }}" method="GET" class="relative w-full sm:w-64">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, seri, tipe..." class="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-200 bg-white text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-shadow shadow-sm">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                    @if(request('search'))
+                        <a href="{{ route('dashboard') }}" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-red-500">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </a>
+                    @endif
+                </form>
             </div>
 
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto flex-1">
                 <table class="w-full text-sm text-left">
                     <thead class="text-xs text-slate-400 uppercase bg-slate-50/50 border-b border-slate-100">
                         <tr>
-                            <th class="px-6 py-4 font-semibold">Nama Realisasi</th>
-                            <th class="px-6 py-4 font-semibold">Tabung & Tipe</th>
-                            <th class="px-6 py-4 font-semibold">Tgl Sewa</th>
-                            <th class="px-6 py-4 font-semibold text-right">Aksi</th>
+                            <th class="px-6 py-4 font-semibold whitespace-nowrap">Nama Realisasi</th>
+                            <th class="px-6 py-4 font-semibold whitespace-nowrap">Tabung & Tipe</th>
+                            <th class="px-6 py-4 font-semibold whitespace-nowrap">Tgl Sewa</th>
+                            <th class="px-6 py-4 font-semibold text-right whitespace-nowrap">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-50">
                         @forelse($activeTransactions as $trx)
                         <tr class="hover:bg-slate-50 transition-colors group">
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="font-bold text-slate-800">{{ $trx->client->name }}</div>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center gap-2">
                                     <span class="font-mono text-xs font-bold bg-slate-100 text-slate-700 px-2 py-1 rounded-lg border border-slate-200">
                                         {{ $trx->cylinder->serial_number }}
@@ -209,11 +212,11 @@
                                     </span>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 text-slate-500">
+                            <td class="px-6 py-4 text-slate-500 whitespace-nowrap">
                                 <div class="text-xs font-medium">{{ $trx->rent_date->format('d M Y') }}</div>
                                 <div class="text-[10px] text-slate-400 mt-0.5">{{ $trx->rent_date->format('H:i') }} WIB</div>
                             </td>
-                            <td class="px-6 py-4 text-right">
+                            <td class="px-6 py-4 text-right whitespace-nowrap">
                                 <form action="{{ route('transaction.return', $trx->id) }}" method="POST">
                                     @csrf @method('PUT')
                                     <button class="text-xs font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 px-4 py-2 rounded-lg transition-colors border border-emerald-100 hover:border-emerald-200 shadow-sm">
@@ -229,14 +232,23 @@
                                     <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-4">
                                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
                                     </div>
-                                    <h3 class="text-slate-800 font-medium">Semua Tabung Aman</h3>
-                                    <p class="text-slate-400 text-sm mt-1">Tidak ada tabung yang sedang disewa saat ini.</p>
+                                    @if(request('search'))
+                                        <h3 class="text-slate-800 font-medium">Pencarian Tidak Ditemukan</h3>
+                                        <p class="text-slate-400 text-sm mt-1">Tidak ada tabung atau client yang sesuai dengan "{{ request('search') }}".</p>
+                                    @else
+                                        <h3 class="text-slate-800 font-medium">Semua Tabung Aman</h3>
+                                        <p class="text-slate-400 text-sm mt-1">Tidak ada tabung yang sedang disewa saat ini.</p>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+
+            <div class="p-4 border-t border-slate-50 bg-slate-50/50">
+                {{ $activeTransactions->links() }}
             </div>
         </div>
     </div>

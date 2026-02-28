@@ -22,33 +22,48 @@
                 <input type="text" name="serial_number" value="{{ $cylinder->serial_number }}" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
             </div>
 
-            <div>
+            <div class="relative" x-data="typeSelect('{{ $cylinder->type }}')">
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tipe Gas</label>
+                <input type="hidden" name="type" x-model="selectedType" required>
                 <div class="relative">
-                    <select name="type" required class="appearance-none w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-medium focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all cursor-pointer">
-                        <option value="O2" {{ $cylinder->type == 'O2' ? 'selected' : '' }}>O2 (Oksigen)</option>
-                        <option value="CO2" {{ $cylinder->type == 'CO2' ? 'selected' : '' }}>CO2 (Karbon Dioksida)</option>
-                        <option value="N2" {{ $cylinder->type == 'N2' ? 'selected' : '' }}>N2 (Nitrogen)</option>
-                        <option value="AR" {{ $cylinder->type == 'AR' ? 'selected' : '' }}>AR (Argon)</option>
-                        <option value="C2H2" {{ $cylinder->type == 'C2H2' ? 'selected' : '' }}>C2H2 (Acetylene)</option>
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    <input type="text" x-model="search" @focus="open = true" @click.outside="open = false" placeholder="Ketik atau pilih Tipe Gas..." class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-medium focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all cursor-pointer placeholder-slate-400" autocomplete="off" readonly>
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
+                        <svg class="w-4 h-4 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
+                </div>
+
+                <div x-show="open" x-transition.opacity.duration.200ms class="absolute z-30 w-full mt-2 bg-white border border-slate-100 rounded-xl shadow-xl max-h-60 overflow-y-auto" style="display: none;">
+                    <ul>
+                        <template x-for="item in options" :key="item">
+                            <li @click="selectItem(item)" class="px-4 py-3 hover:bg-indigo-50 cursor-pointer border-b border-slate-50 last:border-0 transition-colors">
+                                <div class="font-bold text-slate-700 hover:text-indigo-700" x-text="item"></div>
+                            </li>
+                        </template>
+                    </ul>
                 </div>
             </div>
 
-            <div>
+            <div class="relative" x-data="statusSelect('{{ $cylinder->status }}')">
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Status</label>
+                <input type="hidden" name="status" x-model="selectedValue" required>
                 <div class="relative">
-                    <select name="status" required class="appearance-none w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-medium focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all cursor-pointer">
-                        <option value="available" {{ $cylinder->status == 'available' ? 'selected' : '' }}>Tersedia (Ready)</option>
-                        <option value="rented" {{ $cylinder->status == 'rented' ? 'selected' : '' }}>Sedang Disewa</option>
-                        <option value="maintenance" {{ $cylinder->status == 'maintenance' ? 'selected' : '' }}>Perbaikan (Maintenance)</option>
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    <input type="text" x-model="search" @focus="open = true" @click.outside="open = false" placeholder="Pilih Status..." class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-medium focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all cursor-pointer placeholder-slate-400" autocomplete="off" readonly>
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
+                        <svg class="w-4 h-4 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
+                </div>
+
+                <div x-show="open" x-transition.opacity.duration.200ms class="absolute z-20 w-full mt-2 bg-white border border-slate-100 rounded-xl shadow-xl max-h-60 overflow-y-auto" style="display: none;">
+                    <ul>
+                        <template x-for="item in options" :key="item.value">
+                            <li @click="selectItem(item)" class="px-4 py-3 hover:bg-indigo-50 cursor-pointer border-b border-slate-50 last:border-0 transition-colors flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full"
+                                      :class="item.value === 'available' ? 'bg-emerald-500' : (item.value === 'rented' ? 'bg-amber-500' : 'bg-red-500')">
+                                </span>
+                                <div class="font-bold text-slate-700 hover:text-indigo-700" x-text="item.label"></div>
+                            </li>
+                        </template>
+                    </ul>
                 </div>
             </div>
 
@@ -60,4 +75,42 @@
         </form>
     </div>
 </div>
+
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('typeSelect', (initialType = '') => ({
+            options: ['O2', 'CO2', 'N2', 'AR', 'C2H2'],
+            search: initialType,
+            selectedType: initialType,
+            open: false,
+            selectItem(item) {
+                this.selectedType = item;
+                this.search = item;
+                this.open = false;
+            }
+        }));
+
+        Alpine.data('statusSelect', (initialValue = '') => ({
+            options: [
+                { value: 'available', label: 'Tersedia (Ready)' },
+                { value: 'rented', label: 'Sedang Disewa' },
+                { value: 'maintenance', label: 'Perbaikan (Maintenance)' }
+            ],
+            search: '',
+            selectedValue: initialValue,
+            open: false,
+            init() {
+                if (this.selectedValue) {
+                    const selected = this.options.find(opt => opt.value === this.selectedValue);
+                    if (selected) this.search = selected.label;
+                }
+            },
+            selectItem(item) {
+                this.selectedValue = item.value;
+                this.search = item.label;
+                this.open = false;
+            }
+        }));
+    })
+</script>
 @endsection

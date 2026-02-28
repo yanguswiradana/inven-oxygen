@@ -8,8 +8,20 @@ use Illuminate\Http\Request;
 
 class CylinderController extends Controller
 {
-    public function index() {
-        $cylinders = Cylinder::latest()->paginate(15);
+    public function index(Request $request)
+    {
+        $query = Cylinder::query();
+
+        // LOGIKA PENCARIAN
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('serial_number', 'like', "%{$search}%")
+                  ->orWhere('type', 'like', "%{$search}%");
+        }
+
+        // withQueryString agar saat pindah page, search-nya tidak hilang
+        $cylinders = $query->latest()->paginate(15)->withQueryString();
+
         return view('cylinders.index', compact('cylinders'));
     }
 
@@ -18,7 +30,6 @@ class CylinderController extends Controller
     public function store(Request $request) {
         $validatedData = $request->validate([
             'serial_number' => 'required|string|unique:cylinders,serial_number',
-            // VALIDASI STRICT HANYA 5 TIPE INI:
             'type'          => 'required|in:O2,CO2,N2,AR,C2H2',
             'status'        => 'required|in:available,rented,maintenance'
         ]);
@@ -33,7 +44,6 @@ class CylinderController extends Controller
     public function update(Request $request, Cylinder $cylinder) {
         $validatedData = $request->validate([
             'serial_number' => 'required|string|unique:cylinders,serial_number,' . $cylinder->id,
-            // VALIDASI STRICT HANYA 5 TIPE INI:
             'type'          => 'required|in:O2,CO2,N2,AR,C2H2',
             'status'        => 'required|in:available,rented,maintenance'
         ]);
