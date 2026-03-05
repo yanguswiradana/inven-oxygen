@@ -43,7 +43,7 @@
         <div class="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-2xl shadow-lg shadow-indigo-200 p-6 text-white relative overflow-hidden flex flex-col justify-center">
             <div class="relative z-10">
                 <div class="mb-4">
-                    <p class="text-indigo-200 text-xs font-bold uppercase tracking-wider mb-1">Tabung Belum Kembali</p>
+                    <p class="text-indigo-200 text-xs font-bold uppercase tracking-wider mb-1">Tabung Di Client</p>
                     <div class="text-4xl font-bold">{{ $client->transactions()->where('status', 'open')->count() }} <span class="text-lg font-normal text-indigo-200">Unit</span></div>
                 </div>
                 <div>
@@ -61,8 +61,8 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
             </div>
             <div>
-                <h3 class="font-bold text-slate-800">Transaksi Keluar (Sewa Baru)</h3>
-                <p class="text-xs text-slate-400">Pilih tabung yang ingin dibawa oleh realisasi ini.</p>
+                <h3 class="font-bold text-slate-800">Kirim Tabung Tambahan</h3>
+                <p class="text-xs text-slate-400">Kirim tabung baru (bukan tukar) ke pelanggan ini.</p>
             </div>
         </div>
 
@@ -70,12 +70,25 @@
             @csrf
             <input type="hidden" name="client_id" value="{{ $client->id }}">
 
+            <div class="w-full sm:w-48 relative">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Kategori Tagihan</label>
+                <div class="relative">
+                    <select name="category" required class="appearance-none w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-medium focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all cursor-pointer">
+                        <option value="sewa">Sewa Tabung</option>
+                        <option value="hak_milik">Hak Milik (Refill)</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+            </div>
+
             <div class="flex-1 w-full relative" x-data="cylinderSearch({ data: {{ Js::from($availableCylinders) }} })">
                 <label class="flex justify-between items-center text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                    <span>Cari Nomor Seri Tabung</span>
+                    <span>Cari Tabung (Siap Kirim)</span>
                     <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold">Ready: {{ $availableCylinders->count() }}</span>
                 </label>
-                <input type="hidden" name="cylinder_id" x-model="selectedId">
+                <input type="hidden" name="cylinder_id" x-model="selectedId" required>
                 <div class="relative">
                     <input type="text" x-model="search" @focus="open = true" @click.outside="open = false" placeholder="Ketik nomor seri atau tipe gas..." class="w-full px-4 py-3 pl-11 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-medium focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder-slate-400" autocomplete="off">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
@@ -120,20 +133,29 @@
                 <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-100">
                     <tr>
                         <th class="px-6 py-4 font-semibold whitespace-nowrap">No. Seri Tabung</th>
-                        <th class="px-6 py-4 font-semibold whitespace-nowrap">Waktu Pengambilan</th>
-                        <th class="px-6 py-4 font-semibold whitespace-nowrap">Waktu Pengembalian</th>
-                        <th class="px-6 py-4 font-semibold whitespace-nowrap">Balance Waktu</th>
+                        <th class="px-6 py-4 font-semibold whitespace-nowrap">Waktu Kirim</th>
+                        <th class="px-6 py-4 font-semibold whitespace-nowrap">Waktu Kembali</th>
+                        <th class="px-6 py-4 font-semibold whitespace-nowrap">Durasi</th>
                         <th class="px-6 py-4 font-semibold text-right whitespace-nowrap">Status / Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50">
                     @forelse($transactions as $trx)
                     <tr class="hover:bg-slate-50 transition-colors group">
+
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="font-mono text-xs font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1.5 rounded-lg border border-indigo-100 group-hover:bg-indigo-100 transition-colors">
                                 {{ $trx->cylinder->serial_number }}
                             </span>
-                            <div class="text-[10px] text-slate-400 mt-1.5">{{ $trx->cylinder->type }}</div>
+                            <div class="text-[10px] mt-1.5 flex items-center gap-1.5">
+                                <span class="font-bold text-slate-500">{{ $trx->cylinder->type }}</span>
+                                <span class="text-slate-300">•</span>
+                                @if($trx->category == 'sewa')
+                                    <span class="text-amber-600 font-semibold">Sewa</span>
+                                @else
+                                    <span class="text-purple-600 font-semibold">Hak Milik</span>
+                                @endif
+                            </div>
                         </td>
 
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -156,7 +178,7 @@
                                 </div>
                             </div>
                             @else
-                                <span class="text-slate-400 text-xs italic px-2 py-1 bg-slate-100 rounded">Belum Kembali</span>
+                                <span class="text-slate-400 text-xs italic px-2 py-1 bg-slate-100 rounded">Di Pelanggan</span>
                             @endif
                         </td>
 
@@ -165,27 +187,32 @@
                                 <div class="text-amber-600 font-bold text-xs bg-amber-50 px-2 py-1 rounded w-fit border border-amber-100">
                                     {{ $trx->rent_date->diffForHumans(now(), ['syntax' => \Carbon\CarbonInterface::DIFF_ABSOLUTE, 'parts' => 2]) }}
                                 </div>
-                                <span class="text-[10px] text-slate-400 mt-1 block">Durasi berjalan...</span>
                             @else
                                 <div class="text-slate-600 font-bold text-xs bg-slate-100 px-2 py-1 rounded w-fit border border-slate-200">
                                     {{ $trx->rent_date->diffForHumans($trx->return_date, ['syntax' => \Carbon\CarbonInterface::DIFF_ABSOLUTE, 'parts' => 2]) }}
                                 </div>
-                                <span class="text-[10px] text-slate-400 mt-1 block">Total durasi sewa</span>
                             @endif
                         </td>
 
                         <td class="px-6 py-4 text-right whitespace-nowrap">
                             @if($trx->status == 'open')
                                 <div class="flex flex-col items-end gap-2">
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 border border-amber-200">
-                                        <span class="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span> Dipinjam
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200">
+                                        <span class="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span> Di Client
                                     </span>
-                                    <form action="{{ route('transaction.return', $trx->id) }}" method="POST">
-                                        @csrf @method('PUT')
-                                        <button type="submit" class="text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 hover:bg-emerald-600 hover:text-white px-3 py-1.5 rounded-lg transition-colors shadow-sm">
-                                            Terima Kembali
+
+                                    <div class="flex items-center gap-1.5">
+                                        <button type="button" @click="$dispatch('open-swap-modal', { trxId: '{{ $trx->id }}', clientName: '{{ $client->name }}', oldCylinder: '{{ $trx->cylinder->serial_number }}', type: '{{ $trx->cylinder->type }}' })" class="text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-100 hover:bg-blue-600 hover:text-white px-2 py-1.5 rounded transition-colors shadow-sm">
+                                            Tukar Penuh
                                         </button>
-                                    </form>
+
+                                        <form action="{{ route('transaction.return', $trx->id) }}" method="POST" onsubmit="return confirm('Tarik tabung ini kembali ke gudang?')">
+                                            @csrf @method('PUT')
+                                            <button type="submit" class="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 hover:bg-emerald-600 hover:text-white px-2 py-1.5 rounded transition-colors shadow-sm">
+                                                Terima
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             @else
                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
@@ -211,6 +238,62 @@
         <div class="p-4 border-t border-slate-50 bg-slate-50/50">
             {{ $transactions->links() }}
         </div>
+    </div>
+</div>
+
+<div x-data="{ open: false, trxId: '', clientName: '', oldCylinder: '', type: '' }"
+     @open-swap-modal.window="open = true; trxId = $event.detail.trxId; clientName = $event.detail.clientName; oldCylinder = $event.detail.oldCylinder; type = $event.detail.type"
+     x-show="open" class="fixed inset-0 z-50 flex items-center justify-center px-4" style="display: none;">
+
+    <div x-show="open" x-transition.opacity @click="open = false" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+
+    <div x-show="open" x-transition.scale.origin.bottom class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 z-50">
+        <div class="mb-5 border-b border-slate-100 pb-4">
+            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                Proses Tukar Isi Ulang
+            </h3>
+            <p class="text-sm text-slate-500 mt-1">Pelanggan: <span class="font-bold text-slate-700" x-text="clientName"></span></p>
+            <p class="text-sm text-slate-500">Menarik Tabung: <span class="font-bold text-red-500" x-text="oldCylinder"></span> <span class="text-[10px] bg-slate-100 px-1 py-0.5 rounded" x-text="type"></span></p>
+        </div>
+
+        <form :action="`/transaction/${trxId}/swap`" method="POST">
+            @csrf
+
+            <div class="relative mb-6" x-data="cylinderSearch({ data: {{ Js::from($availableCylinders) }} })">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Kirim Tabung Penuh (Ready)</label>
+                <input type="hidden" name="new_cylinder_id" x-model="selectedId" required>
+
+                <div class="relative">
+                    <input type="text" x-model="search" @focus="open = true" @click.outside="open = false" placeholder="Ketik nomor seri tabung penuh..." class="w-full px-4 py-3 pl-11 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-medium focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder-slate-400" autocomplete="off">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                </div>
+
+                <div x-show="open" class="absolute z-50 w-full mt-2 bg-white border border-slate-100 rounded-xl shadow-xl max-h-48 overflow-y-auto" style="display: none;">
+                    <ul>
+                        <li x-show="filteredItems.length === 0" class="px-4 py-3 text-sm text-slate-400 text-center italic">Stok tabung kosong/tidak ada.</li>
+                        <template x-for="item in filteredItems" :key="item.id">
+                            <li @click="selectItem(item)" class="px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-slate-50 last:border-0 transition-colors flex justify-between items-center group">
+                                <div>
+                                    <div class="font-bold text-slate-700 group-hover:text-blue-700" x-text="item.serial_number"></div>
+                                    <div class="text-xs text-slate-400" x-text="item.type"></div>
+                                </div>
+                                <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">Ready</span>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-2">
+                <button type="button" @click="open = false" class="px-5 py-2.5 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors text-sm">Batal</button>
+                <button type="submit" class="px-5 py-2.5 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition-colors text-sm flex items-center gap-2">
+                    Ekseskusi Tukar
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 

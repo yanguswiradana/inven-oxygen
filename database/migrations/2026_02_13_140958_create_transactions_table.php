@@ -10,11 +10,19 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('client_id')->constrained()->onDelete('cascade');
             $table->foreignId('cylinder_id')->constrained()->onDelete('cascade');
-            $table->dateTime('rent_date');
-            $table->dateTime('return_date')->nullable();
+
+            // INI ADALAH TAMBAHAN BARUNYA
+            // Kolom ini akan membedakan tagihan pelanggan nantinya
+            $table->enum('category', ['sewa', 'hak_milik'])->default('sewa');
+
+            $table->timestamp('rent_date');
+            $table->timestamp('return_date')->nullable();
             $table->enum('status', ['open', 'closed'])->default('open');
             $table->timestamps();
         });
     }
-    public function down(): void { Schema::dropIfExists('transactions'); }
+
+    public function down(): void {
+        Schema::dropIfExists('transactions');
+    }
 };

@@ -6,7 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\Transaction;
 use App\Models\Cylinder;
 use App\Models\Client;
-use App\Models\HistoryLog; // Tambahkan ini
+use App\Models\HistoryLog;
 use Carbon\Carbon;
 
 class TransactionSeeder extends Seeder
@@ -16,9 +16,8 @@ class TransactionSeeder extends Seeder
         if (Client::count() == 0 || Cylinder::count() == 0) return;
 
         $transactions = [];
-        $historyLogs = []; // Array untuk menyimpan riwayat log
+        $historyLogs = [];
 
-        // Ambil data ke memory agar seeder berjalan sangat cepat
         $clients = Client::pluck('name', 'id')->toArray();
         $cylinders = Cylinder::pluck('serial_number', 'id')->toArray();
         $allCylinderIds = array_keys($cylinders);
@@ -33,6 +32,10 @@ class TransactionSeeder extends Seeder
             $transactions[] = [
                 'client_id'   => $clientId,
                 'cylinder_id' => $cylinder->id,
+
+                // TAMBAHAN BARU: Sistem akan mengacak 70% data adalah 'sewa', 30% 'hak_milik'
+                'category'    => rand(1, 100) > 30 ? 'sewa' : 'hak_milik',
+
                 'rent_date'   => $rentDate,
                 'return_date' => null,
                 'status'      => 'open',
@@ -40,7 +43,6 @@ class TransactionSeeder extends Seeder
                 'updated_at'  => $rentDate,
             ];
 
-            // Buat Catatan Riwayat
             $historyLogs[] = [
                 'action'      => 'SEWA',
                 'description' => "Tabung {$cylinder->serial_number} keluar ke {$clients[$clientId]} (Sistem Auto)",
@@ -59,6 +61,10 @@ class TransactionSeeder extends Seeder
             $transactions[] = [
                 'client_id'   => $clientId,
                 'cylinder_id' => $cylId,
+
+                // TAMBAHAN BARU DI SINI JUGA
+                'category'    => rand(1, 100) > 30 ? 'sewa' : 'hak_milik',
+
                 'rent_date'   => $rentDate,
                 'return_date' => $returnDate,
                 'status'      => 'closed',
@@ -66,7 +72,6 @@ class TransactionSeeder extends Seeder
                 'updated_at'  => $returnDate,
             ];
 
-            // Buat Catatan Riwayat
             $historyLogs[] = [
                 'action'      => 'KEMBALI',
                 'description' => "Tabung {$cylinders[$cylId]} kembali dari {$clients[$clientId]} (Sistem Auto)",
@@ -75,7 +80,6 @@ class TransactionSeeder extends Seeder
             ];
         }
 
-        // Insert ke database menggunakan Chunk agar RAM tidak penuh
         foreach (array_chunk($transactions, 500) as $chunk) {
             Transaction::insert($chunk);
         }

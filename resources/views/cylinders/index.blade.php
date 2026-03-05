@@ -33,9 +33,10 @@
             <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-100">
                 <tr>
                     <th class="px-6 py-4 font-semibold w-24 text-center">Aksi</th>
-                    <th class="px-6 py-4 font-semibold">Nomor Seri</th>
-                    <th class="px-6 py-4 font-semibold">Tipe Gas</th>
-                    <th class="px-6 py-4 font-semibold">Status Saat Ini</th>
+                    <th class="px-6 py-4 font-semibold whitespace-nowrap">Nomor Seri</th>
+                    <th class="px-6 py-4 font-semibold whitespace-nowrap">Tipe Gas</th>
+                    <th class="px-6 py-4 font-semibold whitespace-nowrap">Posisi & Kategori</th>
+                    <th class="px-6 py-4 font-semibold whitespace-nowrap">Status Fisik</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-50">
@@ -46,22 +47,38 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                         </a>
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-6 py-4 whitespace-nowrap">
                         <span class="font-mono font-bold text-slate-800">{{ $cylinder->serial_number }}</span>
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-6 py-4 whitespace-nowrap">
                         <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200">
                             {{ $cylinder->type }}
                         </span>
                     </td>
-                    <td class="px-6 py-4">
+
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        @if($cylinder->status == 'rented' && $cylinder->activeTransaction)
+                            <div class="flex flex-col gap-1.5">
+                                <span class="font-bold text-slate-700 text-xs">{{ $cylinder->activeTransaction->client->name }}</span>
+                                @if($cylinder->activeTransaction->category == 'sewa')
+                                    <span class="text-[10px] font-medium text-amber-700 bg-amber-100 px-2 py-0.5 rounded w-fit border border-amber-200">Kategori: Sewa</span>
+                                @else
+                                    <span class="text-[10px] font-medium text-purple-700 bg-purple-100 px-2 py-0.5 rounded w-fit border border-purple-200">Kategori: Hak Milik</span>
+                                @endif
+                            </div>
+                        @else
+                            <span class="text-xs text-slate-400 italic">Gudang Internal</span>
+                        @endif
+                    </td>
+
+                    <td class="px-6 py-4 whitespace-nowrap">
                         @if($cylinder->status == 'available')
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Tersedia
                             </span>
                         @elseif($cylinder->status == 'rented')
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700">
-                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Disewa
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Di Client
                             </span>
                         @else
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">
@@ -72,7 +89,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="4" class="px-6 py-10 text-center text-slate-400">
+                    <td colspan="5" class="px-6 py-10 text-center text-slate-400">
                         @if(request('search'))
                             Pencarian untuk "<b>{{ request('search') }}</b>" tidak ditemukan.
                         @else

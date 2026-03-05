@@ -10,16 +10,15 @@ class CylinderController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Cylinder::query();
+        // TAMBAHAN: with(['activeTransaction.client']) untuk menarik data peminjam
+        $query = Cylinder::with(['activeTransaction.client']);
 
-        // LOGIKA PENCARIAN
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where('serial_number', 'like', "%{$search}%")
                   ->orWhere('type', 'like', "%{$search}%");
         }
 
-        // withQueryString agar saat pindah page, search-nya tidak hilang
         $cylinders = $query->latest()->paginate(15)->withQueryString();
 
         return view('cylinders.index', compact('cylinders'));

@@ -15,10 +15,17 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
     Route::get('/dashboard', [TransactionController::class, 'index'])->name('dashboard');
+
+    // --- AREA ROUTE TRANSAKSI ---
     Route::post('/transaction/rent', [TransactionController::class, 'store'])->name('transaction.store');
     Route::put('/transaction/return/{id}', [TransactionController::class, 'returnCylinder'])->name('transaction.return');
+    // TAMBAHAN BARU: Route untuk fitur Tukar Tabung
+    Route::post('/transaction/{id}/swap', [TransactionController::class, 'swap'])->name('transaction.swap');
+
     Route::resource('clients', ClientController::class);
     Route::resource('cylinders', CylinderController::class);
+
     Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
 });
