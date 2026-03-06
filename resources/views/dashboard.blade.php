@@ -83,16 +83,34 @@
 
             <form action="{{ route('transaction.store') }}" method="POST" class="space-y-4">
                 @csrf
-                <div>
+
+                <div class="relative" x-data="categorySelect('sewa')">
                     <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Kategori Tagihan</label>
+                    <input type="hidden" name="category" x-model="selectedValue" required>
+
                     <div class="relative">
-                        <select name="category" required class="appearance-none w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 text-sm font-medium focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all cursor-pointer">
-                            <option value="sewa">Sewa Tabung Bulanan</option>
-                            <option value="hak_milik">Hak Milik (Refill Saja)</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                            <span class="w-2.5 h-2.5 rounded-full shadow-sm transition-colors duration-200" :class="selectedColor"></span>
                         </div>
+
+                        <input type="text" x-model="search" @focus="open = true" @click.outside="open = false" readonly
+                               class="w-full pl-10 pr-10 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 text-sm font-bold focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all cursor-pointer shadow-sm"
+                               placeholder="Pilih Kategori...">
+
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
+                            <svg class="w-4 h-4 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+
+                    <div x-show="open" x-transition.opacity.duration.200ms class="absolute z-30 w-full mt-2 bg-white border border-slate-100 rounded-xl shadow-xl overflow-hidden" style="display: none;">
+                        <ul>
+                            <template x-for="item in options" :key="item.value">
+                                <li @click="selectItem(item)" class="px-4 py-3 hover:bg-slate-50 cursor-pointer border-b border-slate-50 last:border-0 transition-colors flex items-center gap-3">
+                                    <span class="w-2.5 h-2.5 rounded-full shadow-sm" :class="item.color"></span>
+                                    <span class="text-sm font-bold text-slate-700" x-text="item.label"></span>
+                                </li>
+                            </template>
+                        </ul>
                     </div>
                 </div>
 
@@ -181,7 +199,7 @@
                                     <span class="text-[10px] font-bold px-2 py-1 bg-indigo-50 text-indigo-600 rounded">{{ $trx->cylinder->type }}</span>
                                 </div>
                                 @if($trx->category == 'sewa')
-                                    <span class="text-[10px] text-slate-500 font-medium flex items-center gap-1"><span class="w-1.5 h-1.5 bg-amber-400 rounded-full"></span> Sewa</span>
+                                    <span class="text-[10px] text-slate-500 font-medium flex items-center gap-1"><span class="w-1.5 h-1.5 bg-amber-400 rounded-full"></span> Sewa Bulanan</span>
                                 @else
                                     <span class="text-[10px] text-slate-500 font-medium flex items-center gap-1"><span class="w-1.5 h-1.5 bg-purple-500 rounded-full"></span> Hak Milik</span>
                                 @endif
@@ -263,6 +281,25 @@
 
 <script>
     document.addEventListener('alpine:init', () => {
+        // KOMPONEN BARU: Custom Kategori Tagihan
+        Alpine.data('categorySelect', (initialValue = 'sewa') => ({
+            options: [
+                { value: 'sewa', label: 'Sewa Tabung Bulanan', color: 'bg-amber-400' },
+                { value: 'hak_milik', label: 'Hak Milik (Refill Saja)', color: 'bg-purple-500' }
+            ],
+            search: '', selectedValue: initialValue, selectedColor: 'bg-amber-400', open: false,
+            init() {
+                if (this.selectedValue) {
+                    const selected = this.options.find(opt => opt.value === this.selectedValue);
+                    if (selected) { this.search = selected.label; this.selectedColor = selected.color; }
+                }
+            },
+            selectItem(item) {
+                this.selectedValue = item.value; this.search = item.label; this.selectedColor = item.color; this.open = false;
+            }
+        }));
+
+        // Komponen Cari Tabung
         Alpine.data('cylinderSearch', (config) => ({
             items: config.data, search: '', selectedId: '', open: false,
             get filteredItems() {
@@ -271,6 +308,8 @@
             },
             selectItem(item) { this.selectedId = item.id; this.search = item.serial_number + ' (' + item.type + ')'; this.open = false; }
         }));
+
+        // Komponen Cari Realisasi
         Alpine.data('clientSearch', (config) => ({
             items: config.data, search: '', selectedId: '', open: false,
             get filteredItems() {

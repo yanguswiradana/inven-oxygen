@@ -15,17 +15,20 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
     Route::get('/dashboard', [TransactionController::class, 'index'])->name('dashboard');
 
-    // --- AREA ROUTE TRANSAKSI ---
+    // Transaksi
     Route::post('/transaction/rent', [TransactionController::class, 'store'])->name('transaction.store');
     Route::put('/transaction/return/{id}', [TransactionController::class, 'returnCylinder'])->name('transaction.return');
-    // TAMBAHAN BARU: Route untuk fitur Tukar Tabung
     Route::post('/transaction/{id}/swap', [TransactionController::class, 'swap'])->name('transaction.swap');
 
     Route::resource('clients', ClientController::class);
     Route::resource('cylinders', CylinderController::class);
+
+    // --- AREA MANAJEMEN PABRIK (PENGISIAN MASSAL) ---
+    Route::get('/factory', [CylinderController::class, 'factoryIndex'])->name('cylinders.factory');
+    Route::post('/factory/send', [CylinderController::class, 'sendToFactory'])->name('cylinders.send_factory');
+    Route::post('/factory/receive', [CylinderController::class, 'receiveFromFactory'])->name('cylinders.receive_factory');
 
     Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
 });
