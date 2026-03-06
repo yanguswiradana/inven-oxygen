@@ -77,34 +77,26 @@
     document.addEventListener('alpine:init', () => {
         Alpine.data('typeSelect', (initialType = '') => ({
             options: ['O2', 'CO2', 'N2', 'AR', 'C2H2'],
-            search: initialType,
-            selectedType: initialType,
-            open: false,
-            selectItem(item) {
-                this.selectedType = item;
-                this.search = item;
-                this.open = false;
-            }
+            search: initialType, selectedType: initialType, open: false,
+            selectItem(item) { this.selectedType = item; this.search = item; this.open = false; }
         }));
 
         Alpine.data('statusSelect', (initialValue = '') => ({
+            // STATUS BARU (Hanya 3 untuk Create, karena tidak mungkin bikin barang tapi langsung disewa)
             options: [
-                { value: 'available', label: 'Tersedia (Ready)' },
-                { value: 'maintenance', label: 'Perbaikan (Maintenance)' }
+                { value: 'available_full', label: 'Tersedia (Isi Penuh)', color: 'bg-emerald-500' },
+                { value: 'available_empty', label: 'Gudang (Kosong)', color: 'bg-slate-400' },
+                { value: 'at_supplier', label: 'Di Pabrik (Proses Isi)', color: 'bg-blue-500' }
             ],
-            search: '',
-            selectedValue: initialValue,
-            open: false,
+            search: '', selectedValue: initialValue, selectedColor: 'bg-slate-400', open: false,
             init() {
                 if (this.selectedValue) {
                     const selected = this.options.find(opt => opt.value === this.selectedValue);
-                    if (selected) this.search = selected.label;
+                    if (selected) { this.search = selected.label; this.selectedColor = selected.color; }
                 }
             },
             selectItem(item) {
-                this.selectedValue = item.value;
-                this.search = item.label;
-                this.open = false;
+                this.selectedValue = item.value; this.search = item.label; this.selectedColor = item.color; this.open = false;
             }
         }));
     })

@@ -8,11 +8,12 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('client_id')->constrained()->onDelete('cascade');
-            $table->foreignId('cylinder_id')->constrained()->onDelete('cascade');
 
-            // INI ADALAH TAMBAHAN BARUNYA
-            // Kolom ini akan membedakan tagihan pelanggan nantinya
+            // PENTING: cascade dihapus agar saat tabung/client di soft-delete,
+            // riwayat transaksi lama TIDAK ikut terhapus otomatis!
+            $table->foreignId('client_id')->constrained();
+            $table->foreignId('cylinder_id')->constrained();
+
             $table->enum('category', ['sewa', 'hak_milik'])->default('sewa');
 
             $table->timestamp('rent_date');

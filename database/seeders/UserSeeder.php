@@ -3,43 +3,42 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 
 class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1 Akun Developer
+        // 1. Akun Dev (Akses Penuh untukmu)
         User::create([
             'name' => 'Developer',
             'username' => 'dev',
-            'password' => Hash::make('123'),
+            'password' => bcrypt('123'),
+            'role' => 'dev'
         ]);
 
-        // 4 Akun Operasional
+        // 2. Akun Admin Kantor (Akses ke Semua Data)
         User::create([
-            'name' => 'Super Admin',
-            'username' => 'admin',
-            'password' => Hash::make('123'),
+            'name' => 'Admin Laptop',
+            'username' => 'admin1',
+            'password' => bcrypt('123'),
+            'role' => 'admin'
         ]);
 
+        // 3. Akun Admin Tablet (Akses ke Semua Data)
         User::create([
-            'name' => 'Staff Gudang',
-            'username' => 'gudang',
-            'password' => Hash::make('123'),
+            'name' => 'Admin Tablet',
+            'username' => 'admin2',
+            'password' => bcrypt('123'),
+            'role' => 'admin'
         ]);
 
-        User::create([
-            'name' => 'Kasir Utama',
-            'username' => 'kasir',
-            'password' => Hash::make('123'),
-        ]);
-
+        // 4. Akun Tim Lapangan/Kurir (HANYA AKSES DASHBOARD & TUKAR TABUNG)
         User::create([
             'name' => 'Tim Lapangan',
-            'username' => 'lapangan',
-            'password' => Hash::make('123'),
+            'username' => 'kurir',
+            'password' => bcrypt('123'),
+            'role' => 'kurir'
         ]);
     }
 }

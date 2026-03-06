@@ -13,14 +13,19 @@ class CylinderSeeder extends Seeder
         $cylinders = [];
 
         for ($i = 1; $i <= 1000; $i++) {
-            $sn = 'TB-' . str_pad($i, 4, '0', STR_PAD_LEFT); // Hasil: TB-0001
+            $sn = 'TB-' . str_pad($i, 4, '0', STR_PAD_LEFT);
 
-            // Logika acak: 85% Tersedia, 10% Disewa, 5% Rusak
+            // Logika acak baru:
+            // 60% Penuh, 25% Kosong, 10% Di Client (Sewa), 5% Rusak
             $rand = rand(1, 100);
-            $status = 'available';
-            if ($rand > 85 && $rand <= 95) {
+
+            if ($rand <= 60) {
+                $status = 'available_full';
+            } elseif ($rand <= 85) {
+                $status = 'available_empty';
+            } elseif ($rand <= 95) {
                 $status = 'rented';
-            } elseif ($rand > 95) {
+            } else {
                 $status = 'maintenance';
             }
 
