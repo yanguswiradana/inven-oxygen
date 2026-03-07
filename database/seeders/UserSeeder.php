@@ -9,34 +9,34 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Akun Dev (Akses Penuh untukmu)
+        // 1. Akun Dev (Akses Penuh)
         User::create([
             'name' => 'Developer',
-            'username' => 'dev',
+            'username' => 'devwira',
             'password' => bcrypt('123'),
             'role' => 'dev'
         ]);
 
-        // 2. Akun Admin Kantor (Akses ke Semua Data)
+        // 2. Akun Admin Kantor (Akses ke Semua Data Master)
         User::create([
             'name' => 'Admin Laptop',
-            'username' => 'admin1',
+            'username' => 'adminlaptop',
             'password' => bcrypt('123'),
             'role' => 'admin'
         ]);
 
-        // 3. Akun Admin Tablet (Akses ke Semua Data)
+        // 3. Akun Admin Tablet (Akses ke Semua Data Master)
         User::create([
             'name' => 'Admin Tablet',
-            'username' => 'admin2',
+            'username' => 'admintablet',
             'password' => bcrypt('123'),
             'role' => 'admin'
         ]);
 
-        // 4. Akun Tim Lapangan/Kurir (HANYA AKSES DASHBOARD & TUKAR TABUNG)
+        // 4. Akun Tim Lapangan/Kurir (Akses Terbatas)
         User::create([
             'name' => 'Tim Lapangan',
-            'username' => 'kurir',
+            'username' => 'lapangan',
             'password' => bcrypt('123'),
             'role' => 'kurir'
         ]);
