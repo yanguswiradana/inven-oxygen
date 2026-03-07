@@ -76,7 +76,12 @@
                 </a>
             </nav>
 
-            <div class="p-4 border-t border-slate-100">
+            <div class="p-4 border-t border-slate-100 space-y-2">
+                <a href="{{ route('password.edit') }}" class="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {{ request()->routeIs('password.*') ? 'bg-slate-800 text-white shadow-md' : 'text-slate-600 bg-slate-100 hover:bg-slate-200' }}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    Ubah Password
+                </a>
+
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit" class="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 hover:text-red-700 transition-all duration-200">

@@ -15,6 +15,11 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    // --- AREA UBAH PASSWORD ---
+    Route::get('/password', [AuthController::class, 'editPassword'])->name('password.edit');
+    Route::put('/password', [AuthController::class, 'updatePassword'])->name('password.update');
+
     Route::get('/dashboard', [TransactionController::class, 'index'])->name('dashboard');
 
     // Transaksi
@@ -25,7 +30,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('clients', ClientController::class);
     Route::resource('cylinders', CylinderController::class);
 
-    // --- AREA MANAJEMEN PABRIK (PENGISIAN MASSAL) ---
+    // Pabrik
     Route::get('/factory', [CylinderController::class, 'factoryIndex'])->name('cylinders.factory');
     Route::post('/factory/send', [CylinderController::class, 'sendToFactory'])->name('cylinders.send_factory');
     Route::post('/factory/receive', [CylinderController::class, 'receiveFromFactory'])->name('cylinders.receive_factory');
